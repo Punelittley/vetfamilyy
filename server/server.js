@@ -1,8 +1,55 @@
-// server.js
-const PORT = process.env.PORT || 5000; // Обязательно так, Render использует свой порт
+const express = require('express');
+const path = require('path');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const dotenv = require('dotenv');
+const { connectDB } = require('./config/database');
 
-// В начале, где cors
+dotenv.config();
+
+const app = express();
+
+const authRoutes = require('./routes/authRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const doctorRoutes = require('./routes/doctorRoutes');
+const visitRoutes = require('./routes/visitRoutes');
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173', // CLIENT_URL добавим в настройки Render
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true
 }));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
+connectDB();
+
+
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/doctor', doctorRoutes);
+app.use('/api/visits', visitRoutes);
+
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Сервер работает!' });
+});
+
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    message: 'Что-то пошло не так!'
+  });
+});
+
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Сервер запущен на порту ${PORT}`);
+});
