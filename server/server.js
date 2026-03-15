@@ -15,7 +15,7 @@ const doctorRoutes = require('./routes/doctorRoutes');
 const visitRoutes = require('./routes/visitRoutes');
 
 app.use(cors({
-  origin: 'https://vetfamilyy.onrender.com', 
+  origin: process.env.CLIENT_URL || 'http://localhost:5173', 
   credentials: true 
 }));
 
