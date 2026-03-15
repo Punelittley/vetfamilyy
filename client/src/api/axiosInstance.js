@@ -32,18 +32,22 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Интерцептор ответа
+
 axiosInstance.interceptors.response.use(
   (response) => {
     console.log('Ответ:', response.status, response.config.url);
     return response;
   },
   (error) => {
-    console.log('Ошибка ответа:', error.response?.status, error.config?.url);
-    if (error.response?.status === 401) {
-      console.log('401 — перенаправление на /login');
+    const status = error.response?.status;
+    console.log('Ошибка ответа:', status, error.config?.url);
+
+    if (status === 401 && window.location.pathname !== '/login' && window.location.pathname !== '/') {
+      console.log('Сессия истекла или отсутствует — перенаправляем на /login');
+      localStorage.removeItem('user'); 
       window.location.href = '/login';
     }
+
     return Promise.reject(error);
   }
 );
