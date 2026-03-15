@@ -1,38 +1,59 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import axiosInstance from '../../api/axiosInstance';
 import styles from './Header.module.css';
 
 const Header = () => {
-  const [theme, setTheme] = useState(() => {
-    if (typeof window === 'undefined') return 'light';
-    return localStorage.getItem('theme') || 'light';
-  });
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem('user'));
 
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      document.documentElement.setAttribute('data-theme', theme);
+  const handleLogout = async () => {
+    try {
+      await axiosInstance.post('/auth/logout');
+      localStorage.removeItem('user'); 
+      navigate('/login');
+    } catch (error) {
+      console.error('Ошибка при выходе:', error);
+      localStorage.removeItem('user');
+      navigate('/login');
     }
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('theme', theme);
-    }
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
   return (
-    <header className={styles.headerWrapper}>
-      <div className={styles.header}>
-        <img src="/images/лого.png" alt="" className={styles.logo} />
-        {/* <button
-          type="button"
-          className={styles.themeToggle}
-          onClick={toggleTheme}
-        >
-          {theme === 'light' ? 'Тёмная тема' : 'Светлая тема'}
-        </button> */}
+    <header className={styles.header}>
+      <div className={styles.container}>
+        <div className={styles.logoSection} onClick={() => navigate('/')}>
+          <img src="/images/logo.png" alt="VetFamily Logo" className={styles.logoImg} />
+          <span className={styles.clinicName}>VetFamily</span>
+        </div>
+
+        <nav className={styles.nav}>
+          {user ? (
+            <>
+              {user.role === 'doctor' && (
+                <>
+                  <Link to="/doctor" className={styles.navLink}>Пациенты</Link>
+                  <Link to="/doctor/patient/new" className={styles.navLink}>Новый пациент</Link>
+                </>
+              )}
+
+              {user.role === 'admin' && (
+                <>
+                  <Link to="/admin" className={styles.navLink}>Управление врачами</Link>
+                  <Link to="/admin" className={styles.navLink}>Отчеты</Link>
+                </>
+              )}
+
+              <div className={styles.userSection}>
+                <span className={styles.userName}>{user.fullName}</span>
+                <button onClick={handleLogout} className={styles.logoutButton}>Выйти</button>
+              </div>
+            </>
+          ) : (
+            <Link to="/login" className={styles.loginLink}>Войти</Link>
+          )}
+        </nav>
       </div>
-      <div className={styles.line}></div>
     </header>
   );
 };

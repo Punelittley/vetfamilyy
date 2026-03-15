@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './theme.css';
+import Header from './components/Header/Header';
 import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
 import DoctorDashboard from './pages/DoctorDashboard/DoctorDashboard/DoctorDashboard';
@@ -13,18 +14,26 @@ import AdminPatientDetail from './pages/AdminDashboard/AdminPatientDetail/AdminP
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/doctor" element={<DoctorDashboard />} />
-        <Route path="/doctor/patient/:id" element={<PatientDetail />} />
-        <Route path="/doctor/patient/new" element={<AddPatientPage />} /> 
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/doctors/:id" element={<DoctorDetail />} /> 
-        <Route path="/admin/patients/:id" element={<AdminPatientDetail />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <Header />
+      
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          <Route path="/doctor" element={<DoctorDashboard />} />
+          <Route path="/doctor/patient/:id" element={<PatientDetail />} />
+          <Route path="/doctor/patient/new" element={<AddPatientPage />} /> 
+
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/doctors/:id" element={<DoctorDetail />} /> 
+          <Route path="/admin/patients/:id" element={<AdminPatientDetail />} />
+
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </main>
+
     </BrowserRouter>
   );
 }

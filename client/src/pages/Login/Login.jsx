@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 import styles from './Login.module.css';
-import Header from '../../components/Header/Header';
-import Footer from '../../components/Footer/Footer';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,36 +13,22 @@ const Login = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log('Отправка формы:', formData);
-
     try {
       const response = await axiosInstance.post('/auth/login', {
         email: formData.email,
         password: formData.password
       });
 
-      console.log('Ответ сервера:', response.data);
-
       if (response.data.success) {
         localStorage.setItem('user', JSON.stringify(response.data.user));
-
-        console.log('Роль пользователя:', response.data.user.role);
-
         if (response.data.user.role === 'admin') {
           navigate('/admin');
         } else {
@@ -52,7 +36,6 @@ const Login = () => {
         }
       }
     } catch (error) {
-      console.error('Ошибка входа:', error.response?.data);
       setErrors({
         submit: error.response?.data?.message || 'Ошибка при входе'
       });
@@ -61,8 +44,7 @@ const Login = () => {
 
   return (
     <div className={styles.authContainer}>
-      <Header />
-
+      {/* Header удален, так как он теперь в App.jsx */}
       <main className={styles.main}>
         <div className={styles.welcomeSection}>
           <p className={styles.welcomeTitle}>Добрый день!</p>
@@ -71,7 +53,6 @@ const Login = () => {
 
         <div className={styles.authForm}>
           <p className={styles.formTitle}>Войдите в личный кабинет</p>
-
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.formGroup}>
               <label htmlFor="email" className={styles.label}>Логин</label>
@@ -84,9 +65,7 @@ const Login = () => {
                 placeholder="Login ID"
                 className={`${styles.input} ${errors.email ? styles.inputError : ''}`}
               />
-              {errors.email && <span className={styles.errorText}>{errors.email}</span>}
             </div>
-
             <div className={styles.formGroup}>
               <label htmlFor="password" className={styles.label}>Пароль</label>
               <input
@@ -98,27 +77,20 @@ const Login = () => {
                 placeholder="••••••••"
                 className={`${styles.input} ${errors.password ? styles.inputError : ''}`}
               />
-              {errors.password && <span className={styles.errorText}>{errors.password}</span>}
             </div>
+            {errors.submit && <div className={styles.submitError}>{errors.submit}</div>}
             <div className={styles.but}>
-              <button type="submit" className={styles.submitButton}>
-                Войти
-              </button>
+              <button type="submit" className={styles.submitButton}>Войти</button>
             </div>
           </form>
-
           <div className={styles.switchForm}>
-            <button
-              type="button"
-              className={styles.switchButton}
-              onClick={() => navigate('/register')}
-            ><p>Еще нет аккаунта? <span style={{color:"#00547E", fontWeight:"600"}}>Зарегистрироваться</span></p>
+            <button type="button" className={styles.switchButton} onClick={() => navigate('/register')}>
+              <p>Еще нет аккаунта? <span style={{color:"#00547E", fontWeight:"600"}}>Зарегистрироваться</span></p>
             </button>
           </div>
         </div>
       </main>
-
-      <Footer />
+      {/* Footer удален, если ты перенесешь его в App.jsx */}
     </div>
   );
 };
